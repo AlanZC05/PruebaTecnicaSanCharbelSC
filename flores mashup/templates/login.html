@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar Sesion</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #ffb6c1, #ff69b4);
+      font-family: Arial, sans-serif;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; margin: 0;
+    }
+    .login-container {
+      background: #fff; padding: 30px; border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 350px; text-align: center;
+    }
+    h2 { color: #ff1493; }
+    .input-group {
+      margin: 15px 0; display: flex; align-items: center;
+      border: 1px solid #ddd; border-radius: 10px; padding: 10px;
+    }
+    .input-group i { margin-right: 10px; color: #ff69b4; }
+    .input-group input {
+      border: none; outline: none; flex: 1;
+    }
+    button {
+      background: #ff1493; color: #fff; border: none;
+      padding: 10px 20px; border-radius: 10px; cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #e0137c; }
+    p { margin-top: 15px; }
+    a { color: #ff1493; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>🌸BloomHub🌸</h2>
+    <form method="POST" action="/login">
+      <div class="input-group">
+        <i class="fa fa-at"></i>
+        <input type="email" name="correo" placeholder="Correo" required>
+      </div>
+      <div class="input-group">
+        <i class="fa fa-lock"></i>
+        <input type="password" name="contrasena" placeholder="Contraseña" required>
+      </div>
+      <button type="submit">Entrar</button>
+    </form>
+    <p>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
+  </div>
+</body>
+</html>

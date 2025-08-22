@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BloomHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+
+    body {
+      background-color: #fff5f7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+    
+    .bg-pink {
+      background-color: #e91e63 !important;
+    }
+    
+    .text-rose {
+      color: #d81b60;
+    }
+    
+    .bg-lightpink {
+      background-color: #ffe6f0;
+    }
+    
+    .btn-pink {
+      background-color: #e91e63;
+      color: white;
+      border: none;
+    }
+    .btn-pink:hover {
+      background-color: #c2185b;
+      color: white;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+    }
+    .navbar-nav .nav-link {
+      color: #ffdbe9 !important;
+      font-weight: 500;
+      margin-left: 20px;
+    }
+    .navbar-nav .nav-link:hover {
+      text-decoration: underline;
+    }
+    
+    .hero-section {
+      background-color: #ffe6f0;
+      padding: 30px 15px;
+      text-align: center;
+    }
+    .hero-image {
+      width: 90%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .hero-image:hover {
+      transform: scale(1.01);
+    }
+    
+    /* ==== INFO CARD ESTILIZADA ==== */
+    .info-card {
+      background-color: #ffe6f0;
+      border-radius: 20px;
+      padding: 40px;
+    }
+    
+    .info-card h2 {
+      color: #d81b60;
+    }
+    
+    .info-card p {
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      text-align: justify;
+      color: #444;
+    }
+    
+    @media (max-width: 768px) {
+      .info-card {
+        padding: 25px;
+      }
+    
+      .info-card p {
+        font-size: 1rem;
+      }
+    }
+    
+
+    .input-group input[type="text"] {
+      border: 2px solid #f8bbd0;
+      border-radius: 30px 0 0 30px;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+    }
+    
+    .input-group .btn {
+      border-radius: 0 30px 30px 0;
+      font-size: 1.1rem;
+    }
+    
+    .card {
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .flower-img {
+      height: 200px;
+      object-fit: cover;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-radius: 10px;
+      border: 2px solid #f8f9fa;
+    }
+    .flower-img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border-color: #e91e63;
+    }
+    .info-card-result {
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      border: none;
+    }
+    .info-card-result:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .scientific-name {
+      font-style: italic;
+      color: #6c757d;
+    }
+    .care-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f8bbd0;
+    }
+    .care-icon {
+      color: #e91e63;
+      font-size: 1.2rem;
+      min-width: 30px;
+    }
+    #search-btn {
+      background-color: #e91e63;
+      border-color: #e91e63;
+    }
+    #search-btn:hover {
+      background-color: #c2185b;
+      border-color: #ad1457;
+    }
+    .suggestion-chip {
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 3px;
+      border-radius: 20px;
+      padding: 8px 15px;
+      background-color: #f8bbd0;
+      color: #d81b60;
+      font-weight: 500;
+    }
+    .suggestion-chip:hover {
+      background-color: #f48fb1 !important;
+      transform: scale(1.05);
+    }
+    .api-badge {
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      margin: 0 3px;
+    }
+    #loading {
+      display: none;
+    }
+    .wikipedia-card {
+      background-color: #fce4ec;
+      border-left: 4px solid #f48fb1;
+    }
+    #suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    #error {
+      border-radius: 12px;
+      background-color: #fce4ec;
+      border: 1px solid #f8bbd0;
+      animation: shake 0.5s ease-in-out;
+    }
+    #results {
+      background-color: #fff5f7;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    #florist-map {
+      height: 500px;
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+      border: 1px solid #ddd;
+    }
+    
+    .flower-icon-map {
+      background-color: #e91e63;
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      font-size: 16px;
+      border: 2px solid white;
+      width: 30px;
+      height: 30px;
+    }
+    
+    .map-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .map-filter {
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: 1px solid #f8bbd0;
+      background-color: white;
+      color: #d81b60;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .map-filter:hover, .map-filter.active {
+      background-color: #e91e63;
+      color: white;
+    }
+    
+    /* ==== ESTILOS PARA CUIDADOS ==== */
+    .care-container {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+    }
+    
+    .care-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed #e91e63;
+      transition: all 0.3s;
+    }
+    
+    .care-item:hover {
+      background-color: #ffe6f0;
+    }
+    
+    .care-icon {
+      color: #e91e63;
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+
+  
+<nav class="navbar navbar-expand-lg navbar-dark bg-pink sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">🌸 BloomHub</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#info">Información 🌷</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#buscar">Buscar 🌷 </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#florists">Florerías 🌷 </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-light ms-3" href="/logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <section class="hero-section text-center">
+    <img src="https://i.postimg.cc/x8XLP0zH/bloomhub-hero.png" alt="Bienvenida BloomHub" class="hero-image" />
+  </section>
+
+  <section id="buscar" class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card shadow-sm border-0 bg-lightpink">
+          <div class="card-body p-4">
+            <h1 class="card-title text-center text-rose mb-3">
+              <i class="bi bi-search-heart-fill"></i> Buscar flor
+            </h1>
+            <p class="text-center text-muted mb-4">
+              Escribe el nombre de una flor para obtener información. 🌸
+            </p>
+            <div class="input-group mb-3">
+              <input type="text" id="flower-search" class="form-control form-control-lg" placeholder="Ej. girasol, rosa, orquídea..." />
+              <button id="search-btn" class="btn btn-pink btn-lg px-4">Buscar</button>
+            </div>
+            <div id="suggestions" class="d-flex flex-wrap justify-content-center mt-3">
+              
+            </div>
+            
+            <div id="loading" class="text-center my-5 py-4">
+              <div class="spinner-border text-pink" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-3 fs-5 text-muted">Buscando información...</p>
+            </div>
+            
+            <div id="results" style="display: none;">
+              <h2 id="result-title" class="text-center mb-4 text-rose"></h2>
+              
+              <div class="mb-5">
+                <h4 class="mb-4 text-center text-muted">
+                  <i class="bi bi-images"></i> Imágenes
+                </h4>
+                <div id="image-gallery" class="row g-4 justify-content-center"></div>
+                <p id="no-images" class="text-center text-muted mt-3" style="display: none;">
+                  No se encontraron imágenes para esta flor
+                </p>
+              </div>
+              
+              <div class="row g-4 mb-5">
+                <div class="col-lg-6">
+                  <div class="card h-100 info-card-result">
+                    <div class="card-body p-4">
+                      <h4 class="card-title mb-4 text-rose">
+                        <i class="bi bi-info-circle"></i> Información
+                      </h4>
+                      <div id="plant-info"></div>
+                      <div id="wikipedia-info" class="mt-4"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-lg-6">
+                  <div class="card h-100 info-card-result">
+                    <div class="card-body p-4">
+                      <h4 class="card-title mb-4 text-rose">
+                        <i class="bi bi-droplet"></i> Cuidados
+                      </h4>
+                      <div id="plant-care" class="care-container"></div>
+                      <div id="additional-tips" class="mt-3"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="api-badges" class="text-center mt-5 pt-4 border-top">
+               
+              </div>
+            </div>
+            
+            <div id="error" class="alert alert-danger alert-dismissible fade show text-center" 
+                 style="display: none;" role="alert">
+              <div id="error-message" class="fw-bold"></div>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <div id="error-suggestions" class="mt-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+  <section id="florists" class="container py-5">
+    <div class="card shadow-sm border-0 bg-lightpink">
+      <div class="card-body p-4">
+        <h1 class="card-title text-center text-rose mb-4">
+          <i class="bi bi-shop"></i> Florerías en Chihuahua
+        </h1>
+        <p class="text-center text-muted mb-4">
+          Encuentra las mejores florerías de la ciudad en nuestro mapa interactivo
+        </p>
+        
+        <div class="map-controls">
+          <span class="map-filter active" data-filter="all">Todas</span>
+          <span class="map-filter" data-filter="roses">Rosas</span>
+          <span class="map-filter" data-filter="tulips">Tulipanes</span>
+          <span class="map-filter" data-filter="lilies">Lirios</span>
+          <span class="map-filter" data-filter="orchids">Orquídeas</span>
+        </div>
+        
+        <div id="florist-map"></div>
+        
+        <div class="mt-4 text-center">
+          <small class="text-muted">
+            Haz clic en los marcadores para ver información de cada florería
+          </small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="info" class="container py-5">
+      <div class="card info-card p-4 shadow-sm border-0 text-center">
+        <h2 class="text-rose fw-bold mb-4" style="font-size: 2rem;">
+          🌷 Información sobre plantas
+        </h2>
+        <div class="info-content mx-auto" style="max-width: 800px; font-size: 1.1rem; color: #444;">
+          <p>
+            Las flores son una de las formas más bellas y diversas de vida vegetal en nuestro planeta. Son estructuras reproductivas de las plantas angiospermas, y su principal función es facilitar la reproducción mediante la producción de semillas.🌸
+          </p>
+          <p>
+            Sin embargo, más allá de su función biológica, las flores han sido apreciadas durante miles de años por su belleza, fragancia, colores y simbolismo. Desde tiempos antiguos, las civilizaciones han cultivado flores con fines ornamentales, ceremoniales, medicinales y simbólicos.🌸
+          </p>
+          <p>
+            Algunas, como la rosa, la orquídea y el tulipán, son ampliamente conocidas y cultivadas en todo el mundo. Otras, como la protea sudafricana o la rafflesia de Asia (la flor más grande del mundo), son más exóticas y raras.🌸
+          </p>
+          <p>
+            La polinización puede ocurrir de muchas maneras: a través del viento, el agua, insectos como las abejas y mariposas, aves como los colibríes, e incluso por acción humana. Este proceso es vital no solo para la producción de nuevas plantas, sino también para la supervivencia de muchas especies animales y para la seguridad alimentaria humana.🌸
+          </p>
+          <p>
+            Las flores también tienen un fuerte valor simbólico en diversas culturas, siendo usadas en celebraciones, rituales y momentos importantes de la vida humana. Cuidarlas, apreciarlas y comprenderlas es una forma de conectarnos con la naturaleza y nuestra historia como especie.🌸
+          </p>
+        </div>
+      </div>
+    </section>
+
+  
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center p-0">
+          <img id="modal-image" src="" class="img-fluid" alt="" style="max-height: 75vh; width: auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    
+    const popularFlowers = [
+      'rosas', 'tulipanes', 'girasoles', 'orquídeas', 'margaritas',
+      'lirios', 'claveles', 'hortensias', 'jazmines', 'lavanda',
+      'amapolas', 'peonías', 'dalias', 'crisantemos', 'narcisos',
+      'alcatraz', 'cala', 'lirio de agua'
+    ];
+    
+   
+    const nonFlowerTerms = ['auto', 'casa', 'perro', 'gato', 'computadora', 'libro', 'telefono'];
+    
+    
+    const floristsData = [
+      {
+        id: 1,
+        name: "Florería Jardín",
+        lat: 28.635841,
+        lng: -106.076194,
+        address: "Calle 5a #302, Centro",
+        phone: "614 123 4567",
+        flowers: ["roses", "lilies", "peonies", "orchids"],
+        schedule: "L-V 9:00-18:00, S 10:00-15:00",
+        description: "Especialistas en arreglos florales para ocasiones especiales con más de 15 años de experiencia."
+      },
+      {
+        id: 2,
+        name: "Flores del Desierto",
+        lat: 28.627500,
+        lng: -106.070000,
+        address: "Av. Universidad #3302",
+        phone: "614 987 6543",
+        flowers: ["roses", "tulips", "sunflowers"],
+        schedule: "L-S 8:00-20:00",
+        description: "Amplia variedad de flores de temporada y plantas de ornato."
+      },
+      {
+        id: 3,
+        name: "Rosas y Más",
+        lat: 28.642000,
+        lng: -106.065000,
+        address: "C. 24a #1601",
+        phone: "614 555 1234",
+        flowers: ["roses", "lilies", "orchids"],
+        schedule: "L-D 10:00-19:00",
+        description: "Especialistas en rosas de importación y arreglos elegantes."
+      },
+      {
+        id: 4,
+        name: "Tulipanes Chihuahua",
+        lat: 28.630000,
+        lng: -106.072000,
+        address: "Av. Tecnológico #2500",
+        phone: "614 777 8888",
+        flowers: ["tulips", "sunflowers", "peonies"],
+        schedule: "M-S 9:00-17:00",
+        description: "La mejor selección de tulipanes importados de Holanda."
+      },
+      {
+        id: 5,
+        name: "Orquídeas Exóticas",
+        lat: 28.625000,
+        lng: -106.080000,
+        address: "Blvd. Díaz Ordaz #1500",
+        phone: "614 222 3333",
+        flowers: ["orchids", "anthuriums", "bromeliads"],
+        schedule: "L-V 10:00-19:00, S 10:00-14:00",
+        description: "Especialistas en orquídeas y plantas exóticas."
+      }
+    ];
+
+    
+    function initFloristMap() {
+      const map = L.map('florist-map').setView([28.632995, -106.069100], 14);
+      
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> colaboradores'
+      }).addTo(map);
+      
+     
+      const markersLayer = L.layerGroup().addTo(map);
+      
+      
+      const flowerIcon = L.divIcon({
+        className: 'flower-icon-map',
+        html: '🌷',
+        iconSize: [30, 30]
+      });
+      
+     
+      function updateMarkers(filter = 'all') {
+        markersLayer.clearLayers();
+        
+        const filteredFlorists = floristsData.filter(florist => {
+          return filter === 'all' || florist.flowers.includes(filter);
+        });
+        
+        filteredFlorists.forEach(florist => {
+          const marker = L.marker([florist.lat, florist.lng], { icon: flowerIcon })
+            .addTo(markersLayer)
+            .bindPopup(`
+              <h4 class="text-rose">${florist.name}</h4>
+              <p><strong>Dirección:</strong> ${florist.address}</p>
+              <p><strong>Teléfono:</strong> ${florist.phone}</p>
+              <p><strong>Horario:</strong> ${florist.schedule}</p>
+              <p><strong>Especialidades:</strong> ${getFlowerNames(florist.flowers).join(', ')}</p>
+              <p>${florist.description}</p>
+              <button onclick="alert('Contactando a ${florist.name}...\\nTeléfono: ${florist.phone}')" 
+                      style="width: 100%; padding: 5px; background: #e91e63; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Llamar ahora
+              </button>
+            `);
+        });
+      }
+      
+     
+      function getFlowerNames(flowerTypes) {
+        const flowerNames = {
+          'roses': 'Rosas',
+          'tulips': 'Tulipanes',
+          'lilies': 'Lirios',
+          'orchids': 'Orquídeas',
+          'peonies': 'Peonías',
+          'sunflowers': 'Girasoles',
+          'anthuriums': 'Anturios',
+          'bromeliads': 'Bromelias'
+        };
+        
+        return flowerTypes.map(type => flowerNames[type] || type);
+      }
+      
+
+      updateMarkers();
+      
+  
+      document.querySelectorAll('.map-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+          document.querySelectorAll('.map-filter').forEach(f => f.classList.remove('active'));
+          this.classList.add('active');
+          updateMarkers(this.dataset.filter);
+        });
+      });
+    }
+    
+    
+    function showInitialSuggestions() {
+      const container = document.getElementById('suggestions');
+      container.innerHTML = '';
+      
+      popularFlowers.forEach(flower => {
+        const chip = document.createElement('span');
+        chip.className = 'suggestion-chip';
+        chip.textContent = flower;
+        chip.onclick = () => {
+          document.getElementById('flower-search').value = flower;
+          searchFlower();
+        };
+        container.appendChild(chip);
+      });
+    }
+    
+    
+    async function searchFlower() {
+      const query = document.getElementById('flower-search').value.trim();
+      const loadingElement = document.getElementById('loading');
+      const resultsElement = document.getElementById('results');
+      const errorElement = document.getElementById('error');
+      
+     
+      if (query.length === 0) {
+        showError('⚠️ Por favor ingresa el nombre de una flor', popularFlowers.slice(0, 6));
+        return;
+      }
+      
+      if (nonFlowerTerms.some(term => term.toLowerCase() === query.toLowerCase())) {
+        showError(`"${query}" no parece ser una flor. Intenta con:`, popularFlowers);
+        return;
+      }
+      
+      
+      resetUI();
+      loadingElement.style.display = 'block';
+      
+      try {
+       
+        if (query.toLowerCase() === 'alcatraz') {
+          displayResults({
+            query: "alcatraz",
+            plant_info: {
+              name: "Alcatraz (Cala)",
+              scientific_name: "Zantedeschia aethiopica",
+              cycle: "Perenne",
+              care: {
+                watering: "Abundante durante crecimiento, reducir en invierno",
+                sunlight: "Luz filtrada o semisombra",
+                temperature: "No inferior a 10°C",
+                care_level: "Moderado",
+                tips: "Evitar agua estancada en el rizoma para prevenir podredumbre"
+              },
+              description: "Flor elegante en forma de embudo, popular en arreglos florales. Sus hojas son grandes y brillantes."
+            },
+            images: [
+              "https://cdn.pixabay.com/photo/2017/07/25/20/20/calla-lily-2539604_640.jpg",
+              "https://cdn.pixabay.com/photo/2016/07/12/18/54/calla-lily-1512822_640.jpg"
+            ],
+            wikipedia: {
+              summary: "El alcatraz es una planta herbácea perenne de la familia Araceae, nativa del sur de África. Es muy apreciada por sus flores elegantes y su follaje ornamental.",
+              url: "https://es.wikipedia.org/wiki/Zantedeschia_aethiopica"
+            },
+            sources: {
+              perenual: true,
+              pixabay: true,
+              wikipedia: true
+            }
+          });
+          return;
+        }
+        
+       
+        const response = await fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `query=${encodeURIComponent(query)}`
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || data.error) {
+          throw {
+            message: data.error || 'Error en la búsqueda',
+            suggestions: data.suggestions || []
+          };
+        }
+        
+        displayResults(data);
+      } catch (error) {
+        showError(error.message, error.suggestions || []);
+      } finally {
+        loadingElement.style.display = 'none';
+      }
+    }
+    
+   
+    function displayResults(data) {
+      const resultsElement = document.getElementById('results');
+      const imageGallery = document.getElementById('image-gallery');
+      const noImagesElement = document.getElementById('no-images');
+      
+      
+      const displayName = data.plant_info?.name || 
+                        data.query.charAt(0).toUpperCase() + data.query.slice(1);
+      document.getElementById('result-title').textContent = displayName;
+      
+      
+      imageGallery.innerHTML = '';
+      if (data.images && data.images.length > 0) {
+        data.images.forEach(imgUrl => {
+          const col = document.createElement('div');
+          col.className = 'col-md-4 col-6 mb-3';
+          col.innerHTML = `
+            <img src="${imgUrl}" class="img-fluid flower-img" 
+                 alt="${displayName}" 
+                 onclick="showImageModal('${imgUrl}', '${displayName}')">
+          `;
+          imageGallery.appendChild(col);
+        });
+        noImagesElement.style.display = 'none';
+      } else {
+        noImagesElement.style.display = 'block';
+      }
+      
+     
+      const plantInfoElement = document.getElementById('plant-info');
+      const wikipediaInfoElement = document.getElementById('wikipedia-info');
+      
+      if (data.plant_info) {
+        let html = '';
+        if (data.plant_info.scientific_name) {
+          html += `
+            <div class="mb-3">
+              <strong>Nombre científico:</strong> 
+              <span class="scientific-name">${data.plant_info.scientific_name}</span>
+            </div>`;
+        }
+        if (data.plant_info.cycle) {
+          html += `<div class="mb-3"><strong>Ciclo de vida:</strong> ${data.plant_info.cycle}</div>`;
+        }
+        if (data.plant_info.description) {
+          html += `<div class="mt-3">${data.plant_info.description}</div>`;
+        }
+        plantInfoElement.innerHTML = html || '<p>No hay información adicional disponible</p>';
+      } else {
+        plantInfoElement.innerHTML = '<p>No se encontró información detallada</p>';
+      }
+      
+     
+      if (data.wikipedia) {
+        let wikiHtml = '';
+        if (data.wikipedia.summary) {
+          wikiHtml += `
+            <div class="wikipedia-card p-3 rounded">
+              <h5 class="d-flex align-items-center">
+                <i class="bi bi-wikipedia me-2"></i>Wikipedia
+              </h5>
+              <p>${data.wikipedia.summary}</p>`;
+          if (data.wikipedia.url) {
+            wikiHtml += `
+              <a href="${data.wikipedia.url}" target="_blank" 
+                 class="btn btn-sm btn-outline-pink mt-2">
+                  Leer más en Wikipedia
+              </a>`;
+          }
+          wikiHtml += `</div>`;
+        }
+        wikipediaInfoElement.innerHTML = wikiHtml;
+      } else {
+        wikipediaInfoElement.innerHTML = '';
+      }
+      
+      
+      const plantCareElement = document.getElementById('plant-care');
+      plantCareElement.innerHTML = ''; 
+
+      if (data.plant_info?.care) {
+   
+        const careTemplate = `
+          <div class="care-item d-flex align-items-start">
+            <span class="care-icon"><i class="bi bi-droplet"></i></span>
+            <div>
+              <strong>Riego:</strong> ${data.plant_info.care.watering}
+            </div>
+          </div>
+          <div class="care-item d-flex align-items-start">
+            <span class="care-icon"><i class="bi bi-brightness-high"></i></span>
+            <div>
+              <strong>Luz solar:</strong> ${data.plant_info.care.sunlight}
+            </div>
+          </div>
+          <div class="care-item d-flex align-items-start">
+            <span class="care-icon"><i class="bi bi-thermometer-half"></i></span>
+            <div>
+              <strong>Temperatura ideal:</strong> ${data.plant_info.care.temperature || '15-25°C'}
+            </div>
+          </div>
+          <div class="care-item d-flex align-items-start">
+            <span class="care-icon"><i class="bi bi-heart"></i></span>
+            <div>
+              <strong>Nivel de cuidado:</strong> ${data.plant_info.care.care_level}
+            </div>
+          </div>
+          ${data.plant_info.care.tips ? `
+            <div class="alert alert-info mt-3">
+              <i class="bi bi-lightbulb"></i> <strong>Consejo:</strong> ${data.plant_info.care.tips}
+            </div>
+          ` : ''}
+        `;
+
+        plantCareElement.innerHTML = careTemplate;
+      } else if (data.plant_info) {
+       
+        plantCareElement.innerHTML = `
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> Información de cuidados limitada
+          </div>
+          ${data.plant_info.watering ? `
+            <div class="care-item">
+              <strong>Riego:</strong> ${data.plant_info.watering}
+            </div>
+          ` : ''}
+          ${data.plant_info.sunlight ? `
+            <div class="care-item">
+              <strong>Luz solar:</strong> ${data.plant_info.sunlight}
+            </div>
+          ` : ''}
+          <button onclick="searchGenericCare('${data.query}')" class="btn btn-pink mt-3">
+            <i class="bi bi-search"></i> Buscar cuidados genéricos
+          </button>
+        `;
+      } else {
+        plantCareElement.innerHTML = `
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No encontramos información de cuidados específicos. 
+            <button onclick="searchGenericCare('${data.query}')" class="btn btn-sm btn-pink ms-2">
+              Buscar cuidados genéricos
+            </button>
+          </div>
+        `;
+      }
+      
+     
+      const apiBadgesElement = document.getElementById('api-badges');
+      apiBadgesElement.innerHTML = '<small class="text-muted">Fuentes de información: </small>';
+      
+      if (data.sources?.perenual) {
+        apiBadgesElement.innerHTML += '<span class="badge bg-pink api-badge">Perenual</span>';
+      }
+      if (data.sources?.pixabay) {
+        apiBadgesElement.innerHTML += '<span class="badge bg-primary api-badge">Pixabay</span>';
+      }
+      if (data.sources?.unsplash) {
+        apiBadgesElement.innerHTML += '<span class="badge bg-info text-dark api-badge">Unsplash</span>';
+      }
+      if (data.sources?.wikipedia) {
+        apiBadgesElement.innerHTML += '<span class="badge bg-warning text-dark api-badge">Wikipedia</span>';
+      }
+      
+      if (!data.sources || Object.values(data.sources).every(val => !val)) {
+        apiBadgesElement.innerHTML = '<small class="text-muted">No se identificaron fuentes específicas</small>';
+      }
+      
+      resultsElement.style.display = 'block';
+    }
+    
+    window.searchGenericCare = function(flowerName) {
+    
+      const genericCare = {
+        'alcatraz': {
+          watering: 'Mantener la tierra húmeda (no encharcada) especialmente durante crecimiento activo',
+          sunlight: 'Luz indirecta brillante o sol filtrado',
+          temperature: '18-24°C (no tolera heladas)',
+          tips: 'Proteger del frío en invierno y reducir riego en época de reposo'
+        },
+        'rosa': {
+          watering: 'Riego profundo 2-3 veces por semana, evitando mojar las hojas',
+          sunlight: 'Sol directo (al menos 6 horas diarias)',
+          temperature: '15-28°C',
+          tips: 'Podar a finales de invierno para estimular floración'
+        },
+        'orquídea': {
+          watering: 'Riego por inmersión cada 7-10 días, dejar escurrir completamente',
+          sunlight: 'Luz brillante indirecta',
+          temperature: '18-26°C',
+          tips: 'Usar maceta transparente para permitir fotosíntesis en raíces'
+        }
+      };
+      
+      const normalizedName = flowerName.toLowerCase();
+      const careData = genericCare[normalizedName] || {
+        watering: 'Riego moderado cuando el suelo se sienta seco al tacto',
+        sunlight: 'Luz indirecta brillante o sol parcial',
+        temperature: 'Temperatura ambiente (15-25°C)',
+        tips: 'Evitar corrientes de aire y cambios bruscos de temperatura'
+      };
+      
+      
+      document.getElementById('plant-care').innerHTML = `
+        <div class="alert alert-warning mb-3">
+          <i class="bi bi-exclamation-triangle"></i> Cuidados genéricos para ${flowerName}
+        </div>
+        <div class="care-item d-flex align-items-start">
+          <span class="care-icon"><i class="bi bi-droplet"></i></span>
+          <div>
+            <strong>Riego:</strong> ${careData.watering}
+          </div>
+        </div>
+        <div class="care-item d-flex align-items-start">
+          <span class="care-icon"><i class="bi bi-brightness-high"></i></span>
+          <div>
+            <strong>Luz solar:</strong> ${careData.sunlight}
+          </div>
+        </div>
+        <div class="care-item d-flex align-items-start">
+          <span class="care-icon"><i class="bi bi-thermometer-half"></i></span>
+          <div>
+            <strong>Temperatura ideal:</strong> ${careData.temperature}
+          </div>
+        </div>
+        ${careData.tips ? `
+          <div class="alert alert-info mt-3">
+            <i class="bi bi-lightbulb"></i> <strong>Consejo:</strong> ${careData.tips}
+          </div>
+        ` : ''}
+      `;
+    };
+    
+  
+    function showError(message, suggestions = []) {
+      const errorElement = document.getElementById('error');
+      const errorMessage = document.getElementById('error-message');
+      const suggestionsElement = document.getElementById('error-suggestions');
+      
+      errorMessage.innerHTML = message;
+      
+      if (suggestions.length > 0) {
+        suggestionsElement.innerHTML = `
+          <div class="mt-3">
+            <p class="mb-2">Quizás quisiste decir:</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+              ${suggestions.map(flower => `
+                <span class="suggestion-chip" 
+                      onclick="document.getElementById('flower-search').value='${flower}';searchFlower()">
+                  ${flower}
+                </span>
+              `).join('')}
+            </div>
+          </div>`;
+      } else {
+        suggestionsElement.innerHTML = '';
+      }
+      
+      errorElement.style.display = 'block';
+      
+     
+      errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+   
+    function resetUI() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('error').style.display = 'none';
+    }
+    
+   
+    window.showImageModal = function(imgUrl, title) {
+      document.getElementById('modal-image').src = imgUrl;
+      document.getElementById('modal-title').textContent = title;
+      new bootstrap.Modal(document.getElementById('imageModal')).show();
+    };
+    
+   
+    document.addEventListener('DOMContentLoaded', function() {
+      showInitialSuggestions();
+      initFloristMap();
+      
+      document.getElementById('search-btn').addEventListener('click', searchFlower);
+      document.getElementById('flower-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchFlower();
+      });
+    });
+  </script>
+</body>
+</html>
