@@ -1,9 +1,9 @@
 # PruebaTecnicaSanCharbelSC
 Requerimientos
 Python 3.8 o superior
-MySQL (o la base de datos que hayas usado)
+MySQL
 Navegador web
-Conexión a internet (para consumir la API)
+Conexión a internet
 
 También necesitarás instalar algunas librerías de Python:
 Flask
