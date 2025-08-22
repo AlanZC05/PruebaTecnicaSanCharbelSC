@@ -29,9 +29,6 @@ Crea una base de datos en MySQL con el nombre que se indica en el archivo de con
 Ejecuta el script incluido en el repositorio para crear las tablas necesarias (usuarios, información de la API, etc.).
 CREATE DATABASE BloomHub;
 
--- Usar la base de datos
-USE BloomHub_Nueva;
-
 CREATE TABLE usuarios (
     id INT PRIMARY KEY,
     nombre VARCHAR(255),
